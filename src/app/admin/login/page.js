@@ -42,13 +42,16 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         toast.success("Login successful!");
-        // router.push("/admin/dashboard"); 
+        router.push("/admin/signup"); 
       } else {
         toast.error(data.error || "Login failed");
       }
     } catch (err) {
       toast.error("Something went wrong.");
     }
+    setFormData({ email: "", password: "" });
+    setErrors({});
+    setShowPassword(false);
   };
 
   return (

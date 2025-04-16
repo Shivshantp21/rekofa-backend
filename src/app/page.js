@@ -1,10 +1,10 @@
 
-import Signup from "./admin/signup/page";
+import Admin from "./admin/page";
 
 export default function Home() {
   return (
     <div>
-      <Signup/>
+      <Admin/>
     </div>
   );
 }
