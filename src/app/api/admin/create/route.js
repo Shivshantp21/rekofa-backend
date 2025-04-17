@@ -9,6 +9,14 @@ export async function POST(req) {
   const body = await req.json();
   const { name, email, password, secretKey } = body;
 
+  // Validate the required fields
+  if (!name || !email || !password || !secretKey) {
+    return NextResponse.json(
+      { message: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
   console.log("Secret Key in Request:", secretKey);
   console.log("Expected Secret Key:", process.env.ADMIN_SECRET_KEY);
 
@@ -17,7 +25,7 @@ export async function POST(req) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Check if user already exists
+  // Check if the admin already exists
   const existing = await Admin.findOne({ email });
   if (existing) {
     return NextResponse.json(
@@ -26,15 +34,23 @@ export async function POST(req) {
     );
   }
 
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Save new admin
-  const admin = await Admin.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
+    // Save new admin to the database
+    const admin = await Admin.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-  return NextResponse.json({ message: "Admin created", admin });
+    return NextResponse.json({ message: "Admin created successfully", admin });
+  } catch (error) {
+    console.error("Error creating admin:", error);
+    return NextResponse.json(
+      { message: "Failed to create admin", error: error.message },
+      { status: 500 }
+    );
+  }
 }

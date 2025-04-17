@@ -31,28 +31,34 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
+  
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
+  
       if (res.ok) {
+        // ✅ Store token in localStorage
+        localStorage.setItem("token", data.token);
+  
         toast.success("Login successful!");
-        router.push("/admin/signup"); 
+        router.push("/admin/blogs"); 
       } else {
         toast.error(data.error || "Login failed");
       }
     } catch (err) {
       toast.error("Something went wrong.");
     }
+  
     setFormData({ email: "", password: "" });
     setErrors({});
     setShowPassword(false);
   };
+  
 
   return (
     <div className="min-h-screen text-black flex items-center justify-center bg-gray-100 px-4 py-6">
