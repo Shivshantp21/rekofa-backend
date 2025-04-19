@@ -1,21 +1,26 @@
-// src/app/api/admin/signup/route.js
 import dbConnect from "@/lib/dbConnect";
-import User from '@/lib/adminModel';
+import User from "@/lib/adminModel";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   try {
-    const { name, email, password, confirmPass } = await req.json();
+    const { name, email, password, confirmPass, secretKey } = await req.json();
 
-    if (!name || !email || !password || !confirmPass) {
-      return Response.json({ error: "All fields are required." }, { status: 400 });
+    if (!name || !email || !password || !confirmPass || !secretKey) {
+      return Response.json(
+        { error: "All fields including secret key are required." },
+        { status: 400 }
+      );
+    }
+
+    if (secretKey !== process.env.ADMIN_SECRET_KEY) {
+      return Response.json({ error: "Invalid secret key." }, { status: 403 });
     }
 
     if (password !== confirmPass) {
       return Response.json({ error: "Passwords do not match." }, { status: 400 });
     }
 
-    // Strong password regex
     const strongPasswordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/;
     if (!strongPasswordRegex.test(password)) {
@@ -32,7 +37,10 @@ export async function POST(req) {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return Response.json({ error: "User already exists with this email." }, { status: 400 });
+      return Response.json(
+        { error: "User already exists with this email." },
+        { status: 400 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,7 +51,10 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
-    return Response.json({ message: "User registered successfully!", user: newUser }, { status: 201 });
+    return Response.json(
+      { message: "User registered successfully!", user: newUser },
+      { status: 201 }
+    );
   } catch (err) {
     console.error(err);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });

@@ -4,9 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import LogoutButton from "@/app/components/Logout"; // adjust path if needed
 
 const BlogsPage = () => {
   const [blogs, setBlogs] = useState([]);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const fetchBlogs = async () => {
     const res = await fetch("/api/admin/blogs");
@@ -29,8 +33,28 @@ const BlogsPage = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You are not authorized to view this page. Please log in.");
+      // Redirect to login page
+      router.push("/admin/login");
+    } else {
+      // Optionally, verify token on server with fetch here
+      setLoading(false); // allow page to render
+    }
+  }, [router]);
+
+  useEffect(() => {
     fetchBlogs();
   }, []);
+  
+  if (loading) {
+    return (
+      <div className="loader-wrapper">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-br from-gray-50 to-white text-black">
@@ -50,12 +74,15 @@ const BlogsPage = () => {
           + Create Blog
         </Link>
       </div>
+      <div className="flex justify-end mb-6 top-0 right-0 p-4 absolute">
+        <LogoutButton />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
         {blogs.map((blog) => (
           <div
             key={blog._id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border flex flex-col justify-between " 
+            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border flex flex-col justify-between "
           >
             <Link href={blog.link}>
               <div className="cursor-pointer">

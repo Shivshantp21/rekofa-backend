@@ -96,7 +96,7 @@ const Login = () => {
             )}
           </div>
 
-          <div className="relative">
+          <div className="relative mb-5">
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type={showPassword ? "text" : "password"}
@@ -119,9 +119,9 @@ const Login = () => {
             )}
           </div>
 
-          <div className="flex justify-end text-sm text-blue-600 hover:underline cursor-pointer">
+          {/* <div className="flex justify-end text-sm text-blue-600 hover:underline cursor-pointer">
             Forgot Password?
-          </div>
+          </div> */}
 
           <button
             type="submit"

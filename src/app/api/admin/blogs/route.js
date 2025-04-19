@@ -1,6 +1,8 @@
 import connectDb from "@/lib/dbConnect";
 import Blog from "@/lib/blogsModel";
 import { verifyToken } from "@/lib/auth/verifyToken";
+import { NextResponse } from "next/server";
+
 
 export async function GET() {
   await connectDb();
